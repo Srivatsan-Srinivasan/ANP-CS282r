@@ -19,6 +19,9 @@ parser.add_argument('--h_size', action = 'store', default = 128, type = int)
 parser.add_argument('--model_type', action = 'store', default = 'ANP')
 parser.add_argument('--attention', action = 'store', default = 'multihead')
 parser.add_argument('--kernel', action = 'store', default = 'SE')
+parser.add_argument('--data_format', action = 'store', default = 'GP')
+parser.add_argument('--train_batch_size', action = 'store', default = 16, type=int)
+parser.add_argument('--test_batch_size', action = 'store', default = 1, type=int)
 
 #####BOOLEAN##########
 parser.add_argument('--random_kernel_params', action='store_true', default = True)

@@ -10,6 +10,7 @@ from curveReader import GPCurvesReader
 from plotting import plot_1D_curves
 from attention import Attention
 from models import LatentModel
+from utils import get_data
 import os
 
 def train_anp(args):
@@ -21,6 +22,7 @@ def train_anp(args):
     MODEL_TYPE = args.model_type
     ATTENTION_TYPE = args.attention #@param 
     KERNEL = args.kernel
+    DATA_FORMAT = args.data_format
     
     
     random_kernel_parameters= args.random_kernel_params 
@@ -36,19 +38,12 @@ def train_anp(args):
                                                 use_encoder_latent_cross_attention)    
     
     tf.reset_default_graph()
-    # Train dataset
-    dataset_train = GPCurvesReader(
-        batch_size=16, max_num_context=MAX_CONTEXT_POINTS, 
-        random_kernel_parameters=random_kernel_parameters, kernel = KERNEL)
-    data_train = dataset_train.generate_curves()
-    
-    # Test dataset
-    dataset_test = GPCurvesReader(
-        batch_size=1, max_num_context=MAX_CONTEXT_POINTS, testing=True,
-        random_kernel_parameters=random_kernel_parameters, kernel = KERNEL)
-    
-    data_test = dataset_test.generate_curves()
-    
+        
+    data_train, data_test = get_data(DATA_FORMAT, kernel=KERNEL, max_context_points = MAX_CONTEXT_POINTS,
+                                     random_kernel_parameters = random_kernel_parameters, 
+                                     train_batch_size = args.train_batch_size, test_batc_size = args.test_batch_size)
+
+   
     
     # Sizes of the layers of the MLPs for the encoders and decoder
     # The final output layer of the decoder outputs two values, one for the mean and
