@@ -182,3 +182,109 @@ class GPCurvesReader(object):
         target_y=target_y,
         num_total_points=tf.shape(target_x)[1],
         num_context_points=num_context)
+
+
+
+
+# TIME SERIES CLASS
+NPRegressionDescription = collections.namedtuple(
+    "NPRegressionDescription",
+    ("query", "target_y", "num_total_points", "num_context_points"))
+
+
+class PeriodicTSCurvesReader(object):
+  """Generates curves from periodic time series data.
+  """
+
+  def __init__(self,
+               batch_size,
+               max_num_context,
+               data,
+               num_inst,
+               testing=False):
+    """Creates a regression dataset of functions sampled from a GP.
+
+    Args:
+      batch_size: An integer.
+      max_num_context: The max number of observations in the context.
+      testing: Boolean that indicates whether we are testing. If so there are
+          more targets for visualization.
+    """
+    self._batch_size = batch_size
+    self._max_num_context = max_num_context
+    self._data = data
+    self._x_data = self._data[:,1]
+    self._y_data = self._data[:,2]
+    self._testing = testing
+    self._x_uniq,_ = tf.unique(self._x_data)
+    self._num_inst = num_inst
+    self._num_pts_per_inst = tf.cast(self._data.get_shape().as_list()[0]/self._num_inst,tf.int32)
+
+  def generate_curves(self):
+    """Builds the op delivering the data.
+
+    Generated functions are `float32` with x values between -2 and 2.
+    
+    Returns:
+      A `CNPRegressionDescription` namedtuple.
+    """
+    num_context = tf.random_uniform(
+        shape=[], minval=3, maxval=self._max_num_context, dtype=tf.int32)
+
+    # If we are testing we want to have more targets and have them evenly
+    # distributed in order to plot the function.
+    if self._testing:
+      num_target = self._x_data.get_shape().as_list()[0]
+      num_total_points = num_target
+    # During training the number of target points and their x-positions are
+    # selected at random
+    else:
+      num_target = tf.random_uniform(shape=(), minval=0, 
+                                     maxval=self._max_num_context - num_context,
+                                     dtype=tf.int32)
+      num_total_points = num_context + num_target
+
+    # idx for x vals in target
+    idxs = []
+    # which instance to get y data from
+    insts = []
+    for i in range(self._batch_size):
+      idxs.append( tf.random_shuffle(tf.range(self._num_pts_per_inst)) )
+      insts.append( tf.random_uniform(shape=[], minval=0, maxval=self._num_inst-1, dtype=tf.int32) )
+      
+    idxs = tf.stack(idxs)
+    insts = tf.stack(insts)
+      
+    # batchsize x numtotalpoints x size (xsize or ysize)
+    x_values = tf.stack([tf.expand_dims(tf.gather(self._x_uniq, idxs[tf.cast(i,tf.int32)][:tf.cast(num_total_points,tf.int32)]), axis=-1) for i in range(self._batch_size)])
+    y_values = tf.stack([tf.expand_dims(tf.gather(self._y_data[insts[i]*self._num_pts_per_inst:(insts[i]+1)*self._num_pts_per_inst], idxs[i][:num_total_points]), axis=-1) for i in range(self._batch_size)])
+    
+    
+    
+    if self._testing:
+      # Select the targets
+      target_x = x_values
+      target_y = y_values
+
+      # Select the observations
+      idx_ctxt = tf.random_shuffle(tf.range(num_target))
+      context_x = tf.gather(x_values, idx_ctxt[:num_context], axis=1)
+      context_y = tf.gather(y_values, idx_ctxt[:num_context], axis=1)
+
+    else:
+      # Select the targets which will consist of the context points as well as
+      # some new target points
+      target_x = x_values[:, :num_target + num_context, :]
+      target_y = y_values[:, :num_target + num_context, :]
+
+      # Select the observations
+      context_x = x_values[:, :num_context, :]
+      context_y = y_values[:, :num_context, :]
+
+    query = ((context_x, context_y), target_x)
+
+    return NPRegressionDescription(
+        query=query,
+        target_y=target_y,
+        num_total_points=tf.shape(target_x)[1],
+        num_context_points=num_context)
