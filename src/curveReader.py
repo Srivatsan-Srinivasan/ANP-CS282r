@@ -187,11 +187,6 @@ class GPCurvesReader(object):
 
 
 # TIME SERIES CLASS
-NPRegressionDescription = collections.namedtuple(
-    "NPRegressionDescription",
-    ("query", "target_y", "num_total_points", "num_context_points"))
-
-
 class PeriodicTSCurvesReader(object):
   """Generates curves from periodic time series data.
   """
@@ -213,12 +208,12 @@ class PeriodicTSCurvesReader(object):
     self._batch_size = batch_size
     self._max_num_context = max_num_context
     self._data = data
-    self._x_data = self._data[:,1]
-    self._y_data = self._data[:,2]
+    self._x_data = self._data[:,1:-1]
+    self._y_data = self._data[:,-1]
     self._testing = testing
-    self._x_uniq,_ = tf.unique(self._x_data)
     self._num_inst = num_inst
     self._num_pts_per_inst = tf.cast(self._data.get_shape().as_list()[0]/self._num_inst,tf.int32)
+    self._x_uniq = self._x_data[:self._num_pts_per_inst] #tf.unique(self._x_data)
 
   def generate_curves(self):
     """Builds the op delivering the data.
@@ -280,6 +275,9 @@ class PeriodicTSCurvesReader(object):
       # Select the observations
       context_x = x_values[:, :num_context, :]
       context_y = y_values[:, :num_context, :]
+      
+    context_x = tf.squeeze(context_x,-1)
+    target_x = tf.squeeze(target_x,-1)
 
     query = ((context_x, context_y), target_x)
 
