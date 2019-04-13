@@ -7,7 +7,7 @@ Created on Sat Apr 13 11:18:07 2019
 import matplotlib.pyplot as plt
 
 #@title
-def plot_1D_curves(target_x, target_y, context_x, context_y, pred_y, std, save = True, filename = filename):
+def plot_1D_curves(target_x, target_y, context_x, context_y, pred_y, std, save = True, filename = 'default'):
   """Plots the predicted mean and variance and the context points.
   
   Args: 

@@ -29,7 +29,7 @@ def train_anp(args):
     use_encoder_latent_self_attention = args.SA_lat_encoder 
     use_encoder_latent_cross_attention = args.CA_lat_encoder 
     
-    filename = 'anp_loss_arr_{}_{}_{}_{}_{}_{}.npy'.format(KERNEL,ATTENTION_TYPE,
+    filename = 'anp_loss_arr_{}_{}_{}_{}_{}_{}'.format(KERNEL,ATTENTION_TYPE,
                                                 use_decoder_self_attention,
                                                 use_encoder_determ_self_attention,
                                                 use_encoder_latent_self_attention,
@@ -104,7 +104,9 @@ def train_anp(args):
                   [loss, mu, sigma, data_test.target_y, 
                    data_test.query]) 
                 loss_arr[it] = loss_value   
-                np.save(filename,loss_arr)
+
+                loss_filename = os.path.join('loss_collection', filename + '.npy')
+                np.save(loss_filename,loss_arr)
                 
             # Plot the predictions in `PLOT_AFTER` intervals    
             if it % PLOT_AFTER == 0:                
@@ -112,8 +114,8 @@ def train_anp(args):
                 print('Iteration: {}, loss: {}'.format(it, loss_value))    
                 # Plot the prediction and the context
                 
-                curves_filename = 'curves_'+filename+ '_' + str(it)  
-                fname = os.path.join('temp_img',curves_filename)
+                curves_filename = 'curves_'+ filename + '_' + str(it)  
+                fname = os.path.join('temp_img',curves_filename + '.png')
                 plot_1D_curves(target_x, target_y, context_x, context_y, pred_y, std_y,filename = fname)
           
         
