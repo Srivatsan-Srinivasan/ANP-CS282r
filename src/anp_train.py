@@ -41,7 +41,7 @@ def train_anp(args):
         
     data_train, data_test = get_data(DATA_FORMAT, kernel=KERNEL, max_context_points = MAX_CONTEXT_POINTS,
                                      random_kernel_parameters = random_kernel_parameters, 
-                                     train_batch_size = args.train_batch_size, test_batc_size = args.test_batch_size)
+                                     train_batch_size = args.train_batch_size, test_batch_size = args.test_batch_size)
 
    
     

@@ -12,7 +12,7 @@ def args_check(args):
         raise NameError('model_type name invalid')
     elif args.kernel not in ['SE','PER','custom']:
         raise NameError('kernel name invalid')
-     elif args.n_context_max <=3 :
+    elif args.n_context_max <=3 :
         raise ValueError('Max number of context points should be greater than 3')
     
     print('Yay! All args are consistent')

@@ -44,7 +44,8 @@ def batch_mlp(input, output_sizes, variable_scope):
 
 
 def get_raw_ts_tensor(train_test_split = 0.8):      
-    data = np.zeros([100,4])
+    data = np.random.rand(100,4)
+    data = data.astype('float32')
     data[:,0] = [i//10 for i in range(100)]
     
     unique_ids = np.unique(data[:,0])
