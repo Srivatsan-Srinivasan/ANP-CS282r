@@ -58,7 +58,7 @@ def train_anp(args):
     deterministic_encoder_output_sizes= [HIDDEN_SIZE]*4
     decoder_output_sizes = [HIDDEN_SIZE]*2 + [2]
     use_deterministic_path = True
-    
+     
     # ANP with multihead attention
     if MODEL_TYPE == 'ANP':
       attention = Attention(rep='mlp', output_sizes=[HIDDEN_SIZE]*2, 
