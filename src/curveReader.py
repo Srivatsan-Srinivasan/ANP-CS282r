@@ -339,6 +339,7 @@ class ImageCompletionReader(object):
     self._min_num_context = min_num_context
     self._max_num_context = max_num_context
     self._data = data
+    # Hardcoded for right now
     self._x_data = self._data[:,1:-1]
     self._y_data = self._data[:,-1:]
     self._testing = testing

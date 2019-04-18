@@ -48,8 +48,9 @@ def plot_1D_curves(target_x, target_y, context_x, context_y, pred_y, std, save =
       plt.savefig(filename)
 
 def plot_imgs(target_x,target_y,context_x,context_y,pred_y,std,save=True,filename = 'default',n_samp=5):
-  nrows = max(target_x[:,:,0])+1
-  ncols = max(target_x[:,:,1])+1
+  # Hardcoded for right now
+  nrows = 28 #max(target_x[:,:,0])+1
+  ncols = 28 #max(target_x[:,:,1])+1
 
   pred_y = pred_y.reshape(nrows,ncols)
   std = std.reshape(nrows,ncols)
