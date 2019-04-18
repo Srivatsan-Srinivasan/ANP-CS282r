@@ -339,8 +339,8 @@ class ImageCompletionReader(object):
     self._min_num_context = min_num_context
     self._max_num_context = max_num_context
     self._data = data
-    self._x_data = self._data[:,1:-3]
-    self._y_data = self._data[:,-3:]
+    self._x_data = self._data[:,1:-1]
+    self._y_data = self._data[:,-1:]
     self._testing = testing
     self._num_inst = num_inst
     self._num_pts_per_inst = tf.cast(self._data.get_shape().as_list()[0]/self._num_inst,tf.int32)
