@@ -49,7 +49,7 @@ def train_anp(args):
                                      random_kernel_parameters = random_kernel_parameters, 
                                      train_batch_size = args.train_batch_size, test_batch_size = args.test_batch_size)
 
-   
+    print('Data Generated!')   
     
     # Sizes of the layers of the MLPs for the encoders and decoder
     # The final output layer of the decoder outputs two values, one for the mean and
