@@ -83,8 +83,8 @@ def get_raw_img_tensor(train_test_split = 0.8, pixel_dim = 1, im_data = 'synthet
         (x_train, y_train),(x_test, y_test) = mnist.load_data()
         x_train, x_test = x_train / 255.0, x_test / 255.0
 
-        train_data = np.array([[i,j,k,x_train[i,j,k]] for i in range(x_train.shape[0]) for j in range(x_train.shape[1]) for k in range(x_train.shape[2])])
-        test_data = np.array([[i,j,k,x_test[i,j,k]] for i in range(x_test.shape[0]) for j in range(x_test.shape[1]) for k in range(x_test.shape[2])])
+        train_data = np.array([[i,j,k,x_train[i,j,k]] for i in range(x_train.shape[0]) for j in range(x_train.shape[1]) for k in range(x_train.shape[2])],dtype='float32')
+        test_data = np.array([[i,j,k,x_test[i,j,k]] for i in range(x_test.shape[0]) for j in range(x_test.shape[1]) for k in range(x_test.shape[2])],dtype='float32')
 
         split = train_data.shape[0]
         inv_split = test_data.shape[0]
