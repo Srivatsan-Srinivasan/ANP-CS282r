@@ -16,6 +16,7 @@ import os
 def train_anp(args):
     TRAINING_ITERATIONS = args.n_iter 
     MAX_CONTEXT_POINTS = args.n_context_max 
+    MIN_CONTEXT_POINTS = args.n_context_min
     PLOT_AFTER = args.plot_after
     LOSS_AFTER = args.loss_after
     HIDDEN_SIZE = args.h_size 
@@ -47,7 +48,7 @@ def train_anp(args):
         
     data_train, data_test = get_data(DATA_FORMAT, kernel=KERNEL, max_context_points = MAX_CONTEXT_POINTS,
                                      random_kernel_parameters = random_kernel_parameters, 
-                                     train_batch_size = args.train_batch_size, test_batch_size = args.test_batch_size)
+                                     train_batch_size = args.train_batch_size, test_batch_size = args.test_batch_size, min_context_points = MIN_CONTEXT_POINTS)
 
     print('Data Generated!')   
     

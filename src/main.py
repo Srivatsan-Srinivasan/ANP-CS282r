@@ -13,6 +13,7 @@ parser = argparse.ArgumentParser()
 
 parser.add_argument('--n_iter', action = 'store', default = 10000, type=int)
 parser.add_argument('--n_context_max', action = 'store', default = 50, type = int)
+parser.add_argument('--n_context_min', action = 'store', default = 3, type = int)
 parser.add_argument('--plot_after', action = 'store', default = 10000, type = int)
 parser.add_argument('--loss_after', action = 'store', default = 100, type = int)
 parser.add_argument('--h_size', action = 'store', default = 128, type = int)
