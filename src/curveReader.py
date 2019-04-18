@@ -312,8 +312,10 @@ class PeriodicTSCurvesReader(object):
 # imdata[:,1] = [(i/32)%32 for i in range(100*32*32)]
 # imdata[:,2] = [i%32 for i in range(100*32*32)]
 # imdata = tf.convert_to_tensor(imdata)
-# dataset_train = ImageCompletionReader(16,10,10,imdata,100)
+# dataset_train = ImageCompletionReader(16,3,10,imdata,100)
 # data_train = dataset_train.generate_curves()
+# dataset_test = ImageCompletionReader(1,3,10,imdata,100)
+# data_test = dataset_train.generate_curves()
 class ImageCompletionReader(object):
   """Generates curves from periodic time series data.
   """

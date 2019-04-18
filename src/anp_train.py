@@ -32,12 +32,12 @@ def train_anp(args):
     use_encoder_latent_self_attention = args.SA_lat_encoder 
     use_encoder_latent_cross_attention = args.CA_lat_encoder 
     
-    if MODEL_TYPE == 'GP':
+    if DATA_FORMAT == 'GP':
         modelname = MODEL_TYPE + '_'+  KERNEL
     else:
         modelname = MODEL_TYPE
 
-    filename = 'anp_loss_arr_{}_{}_{}_{}_{}_{}'.format(modelname,ATTENTION_TYPE,
+    filename = 'anp_loss_arr_{}_{}_{}_{}_{}_{}_{}'.format(DATA_FORMAT,modelname,ATTENTION_TYPE,
                                                 use_decoder_self_attention,
                                                 use_encoder_determ_self_attention,
                                                 use_encoder_latent_self_attention,
@@ -117,9 +117,11 @@ def train_anp(args):
                 
                 curves_filename = 'curves_'+ filename + '_' + str(it)  
                 fname = os.path.join('temp_img',curves_filename + '.png')
-                plot_1D_curves(target_x, target_y, context_x, context_y, pred_y, std_y,filename = fname)
-          
-        
+                if DATA_FORMAT in ['GP','TS']:
+                    plot_1D_curves(target_x, target_y, context_x, context_y, pred_y, std_y,filename = fname)
+                elif DATA_FORMAT in ['mnist']:
+                    plot_img(target_x, target_y, context_x, context_y, pred_y, std_y,filename = fname)
+
           
         
           

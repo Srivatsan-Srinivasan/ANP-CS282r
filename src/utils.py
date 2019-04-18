@@ -59,10 +59,41 @@ def get_raw_ts_tensor(train_test_split = 0.8):
  
     return split, len(random_unique_ids)-split, tf.convert_to_tensor(train_data), tf.convert_to_tensor(test_data) 
 
+def get_raw_img_tensor(train_test_split = 0.8, pixel_dim = 1, im_data = 'synthetic'):      
+    if im_data == 'synthetic':
+        imdata = np.zeros((100*32*32,3+pixel_dim),dtype='float32')
+        imdata[:,0] = [i//(32*32) for i in range(100*32*32)]
+        imdata[:,1] = [(i/32)%32 for i in range(100*32*32)]
+        imdata[:,2] = [i%32 for i in range(100*32*32)]
+
+        unique_ids = np.unique(data[:,0])
+        random_unique_ids = np.random.permutation(unique_ids)
+        split = int(train_test_split * len(random_unique_ids))
+        train_ids, test_ids = random_unique_ids[:split], random_unique_ids[split:]
+
+        train_data = data[np.where(np.isin(data[:,0],train_ids))]
+        test_data = data[np.where(np.isin(data[:,0],test_ids))]
+
+        inv_split = len(random_unique_ids)-split
+    elif im_data == 'mnist':
+        # assert(pixel_dim == 1,'Pixel dim for MNIST should be 1!')
+
+        mnist = tf.keras.datasets.mnist
+
+        (x_train, y_train),(x_test, y_test) = mnist.load_data()
+        x_train, x_test = x_train / 255.0, x_test / 255.0
+
+        train_data = [[i,j,k,x_train[i,j,k]] for i in range(x_train.shape[0]) for j in range(x_train.shape[1]) for k in range(x_train.shape[2])]
+        test_data = [[i,j,k,x_test[i,j,k]] for i in range(x_test.shape[0]) for j in range(x_test.shape[1]) for k in range(x_test.shape[2])]
+
+        split = train_data.shape[0]
+        inv_split = test_data.shape[0]
+
+    return split, inv_split, tf.convert_to_tensor(train_data), tf.convert_to_tensor(test_data) 
 
 # Data - expected numpy array - No.of rows by 3 Columns - id, X and Y.
 def get_data(data_format, kernel = None, max_context_points = None, 
-             random_kernel_parameters = True, test_batch_size =1, train_batch_size =16):
+             random_kernel_parameters = True, test_batch_size =1, train_batch_size =16, min_context_points = None):
     if data_format == 'GP':
         dataset_train = GPCurvesReader(
             batch_size = train_batch_size, max_num_context=max_context_points, 
@@ -86,11 +117,21 @@ def get_data(data_format, kernel = None, max_context_points = None,
         dataset_test = PeriodicTSCurvesReader(test_batch_size, max_context_points,
                                                test_data, test_num_instances, testing = True)
         
-        data_test = dataset_train.generate_curves()  
-  
+        data_test = dataset_train.generate_curves()
+
+    elif data_format == 'mnist':
+        train_num_instances, test_num_instances, train_data, test_data = get_raw_img_tensor(im_data=data_format)
+        
+        dataset_train = ImageCompletionReader(train_batch_size, min_context_points, max_context_points,
+                                               train_data, train_num_instances, testing = False)
+        data_train = dataset_train.generate_curves()
+        
+        dataset_test = ImageCompletionReader(test_batch_size, min_context_points, max_context_points,
+                                               test_data, test_num_instances, testing = True)
+        
+        data_test = dataset_train.generate_curves()
 
     
     return data_train, data_test
-    
     
 

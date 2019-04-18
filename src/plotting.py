@@ -46,4 +46,37 @@ def plot_1D_curves(target_x, target_y, context_x, context_y, pred_y, std, save =
       plt.show()
   else:
       plt.savefig(filename)
-      
+
+def plot_imgs(target_x,target_y,context_x,context_y,pred_y,std,save=True,filename = 'default',n_samp=5):
+  nrows = max(target_x[:,0])+1
+  ncols = max(target_x[:,1])+1
+
+  pred_y = pred_y.reshape(nrows,ncols)
+  std = std.reshape(nrows,ncols)
+
+  mean = pred_y
+  samps = np.random.normal(pred_y,std,size=(n_samp,pred_y.shape[0],pred_y.shape[1]))
+
+
+
+  context_img = np.zeros((nrows,ncols))
+  for i in range(len(context_x)):
+    x = context_x[i]
+    context_img[x[0],x[1]] = context_y[i]
+
+
+  fig=plt.figure(figsize=(16, 16))
+  columns = 1
+  rows = n_samp+1
+  for i in range(1, columns*rows +1):
+      fig.add_subplot(rows,columns,i)
+      if i == 1:
+        plt.imshow(context_img)
+      else:
+        plt.imshow(samps[i-2])
+  
+  if not save:
+      plt.show()
+  else:
+      plt.savefig(filename)
+

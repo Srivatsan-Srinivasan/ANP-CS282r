@@ -14,5 +14,7 @@ def args_check(args):
         raise NameError('kernel name invalid')
     elif args.n_context_max <=3 :
         raise ValueError('Max number of context points should be greater than 3')
+    elif args.data_format not in ['GP','TS','mnist']:
+    	raise NameError('Data format invalid')
     
     print('Yay! All args are consistent')
