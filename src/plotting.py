@@ -54,8 +54,14 @@ def plot_imgs(target_x,target_y,context_x,context_y,pred_y,std,save=True,filenam
   ncols = 28 #max(target_x[:,:,1])+1
 
   context_img = np.zeros((nrows,ncols))
-  print(context_x.shape)
-  print(content_y.shape)
+  if len(context_x.shape) == 3:
+    context_x = context_x[0]
+    context_y = context_y[0]
+  if len(target_x.shape) == 3:
+    target_x = target_x[0]
+    target_y = target_y[0]
+
+
   for i in range(len(context_x)):
     x = context_x[i]
     context_img[x[0],x[1]] = context_y[i]
