@@ -23,6 +23,7 @@ def train_anp(args):
     ATTENTION_TYPE = args.attention #@param 
     KERNEL = args.kernel
     DATA_FORMAT = args.data_format
+    decoder_output_size = args.decoder_output_size
     
     
     random_kernel_parameters= args.random_kernel_params 
@@ -51,7 +52,7 @@ def train_anp(args):
     latent_encoder_output_sizes = [HIDDEN_SIZE]*4
     num_latents = HIDDEN_SIZE
     deterministic_encoder_output_sizes= [HIDDEN_SIZE]*4
-    decoder_output_sizes = [HIDDEN_SIZE]*2 + [2]
+    decoder_output_sizes = [HIDDEN_SIZE]*2 + [decoder_output_size*2]
     use_deterministic_path = True
     
     # ANP with multihead attention
