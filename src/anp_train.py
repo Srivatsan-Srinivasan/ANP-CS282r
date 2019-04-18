@@ -32,7 +32,12 @@ def train_anp(args):
     use_encoder_latent_self_attention = args.SA_lat_encoder 
     use_encoder_latent_cross_attention = args.CA_lat_encoder 
     
-    filename = 'anp_loss_arr_{}_{}_{}_{}_{}_{}'.format(KERNEL,ATTENTION_TYPE,
+    if MODEL_TYPE == 'GP':
+        modelname = MODEL_TYPE + '_'+  KERNEL
+    else:
+        modelname = MODEL_TYPE
+
+    filename = 'anp_loss_arr_{}_{}_{}_{}_{}_{}'.format(modelname,ATTENTION_TYPE,
                                                 use_decoder_self_attention,
                                                 use_encoder_determ_self_attention,
                                                 use_encoder_latent_self_attention,
@@ -54,7 +59,7 @@ def train_anp(args):
     deterministic_encoder_output_sizes= [HIDDEN_SIZE]*4
     decoder_output_sizes = [HIDDEN_SIZE]*2 + [decoder_output_size*2]
     use_deterministic_path = True
-    
+     
     # ANP with multihead attention
     if MODEL_TYPE == 'ANP':
       attention = Attention(rep='mlp', output_sizes=[HIDDEN_SIZE]*2, 
