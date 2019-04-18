@@ -7,7 +7,7 @@ Created on Sat Apr 13 11:19:29 2019
 import tensorflow as tf
 import numpy as np
 from curveReader import GPCurvesReader
-from plotting import plot_1D_curves
+from plotting import plot_1D_curves, plot_imgs
 from attention import Attention
 from models import LatentModel
 from utils import get_data
@@ -125,7 +125,7 @@ def train_anp(args):
                 if DATA_FORMAT in ['GP','TS']:
                     plot_1D_curves(target_x, target_y, context_x, context_y, pred_y, std_y,filename = fname)
                 elif DATA_FORMAT in ['mnist']:
-                    plot_img(target_x, target_y, context_x, context_y, pred_y, std_y,filename = fname)
+                    plot_imgs(target_x, target_y, context_x, context_y, pred_y, std_y,filename = fname)
 
           
         
