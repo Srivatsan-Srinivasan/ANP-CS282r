@@ -64,7 +64,7 @@ def plot_imgs(target_x,target_y,context_x,context_y,pred_y,std,save=True,filenam
 
   for i in range(len(context_x)):
     x = context_x[i]
-    context_img[x[0],x[1]] = context_y[i]
+    context_img[int(x[0]),int(x[1])] = context_y[i]
 
   mean = pred_y
   samps = np.random.normal(pred_y,std,size=(n_samp,pred_y.shape[0]))
@@ -78,7 +78,7 @@ def plot_imgs(target_x,target_y,context_x,context_y,pred_y,std,save=True,filenam
 
     for j in range(len(target_x)):
       x = target_x[j]
-      pred_imgs[i,x[0],x[1]] = img_int[j]
+      pred_imgs[i,int(x[0]),int(x[1])] = img_int[j]
 
 
   fig=plt.figure(figsize=(16, 16))
