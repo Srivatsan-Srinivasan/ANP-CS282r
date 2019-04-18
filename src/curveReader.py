@@ -360,7 +360,7 @@ class ImageCompletionReader(object):
     # If we are testing we want to have more targets and have them evenly
     # distributed in order to plot the function.
     if self._testing:
-      num_target = self._x_data.get_shape().as_list()[0]
+      num_target = self._num_pts_per_inst #self._x_data.get_shape().as_list()[0]
       num_total_points = num_target
     # During training the number of target points and their x-positions are
     # selected at random
