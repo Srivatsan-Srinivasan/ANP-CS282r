@@ -84,11 +84,13 @@ class GPCurvesReader(object):
         norm = tf.reduce_sum(norm, -1)  # [B, data_size, num_total_points, num_total_points]
         # [B, y_size, num_total_points, num_total_points]
         kernel = tf.square(sigma_f)[:, :, None, None] * tf.exp(-norm)
+    elif self._kernel == 'PER_NS': # periodic, non-stationary kernel
+
     else:
         norm = tf.square(diff[:, None, :, :, :] / l1[:, :, None, None, :])
         norm = tf.reduce_sum(norm, -1)  # [B, data_size, num_total_points, num_total_points]
         # [B, y_size, num_total_points, num_total_points]
-        kernel = tf.square(sigma_f)[:, :, None, None] * tf.exp(-0.5*norm)    
+        kernel = tf.square(sigma_f)[:, :, None, None] * tf.exp(-0.5*norm)
 
     # Add some noise to the diagonal to make the cholesky work.
     kernel += (sigma_noise**2) * tf.eye(num_total_points)
@@ -298,6 +300,160 @@ class PeriodicTSCurvesReader(object):
         target_y=target_y,
         num_total_points=tf.shape(target_x)[1],
         num_context_points=num_context)
+
+
+
+
+
+
+
+
+
+
+
+
+class PeriodicNSCurvesReader(object):
+  """Generates curves using a Gaussian Process (GP).
+
+  Supports vector inputs (x) and vector outputs (y). Kernel is
+  mean-squared exponential, using the x-value l2 coordinate distance scaled by
+  some factor chosen randomly in a range. Outputs are independent gaussian
+  processes.
+  """
+
+  def __init__(self,
+               batch_size,
+               max_num_context,
+               x_size=1,
+               y_size=1,
+               l1_scale=0.6,
+               sigma_scale=1.0,
+               epsilon=0.01,
+               num_gammas=2,
+               random_kernel_parameters=True,
+               testing=False):
+    """Creates a regression dataset of functions sampled from a GP.
+
+    Args:
+      batch_size: An integer.
+      max_num_context: The max number of observations in the context.
+      x_size: Integer >= 1 for length of "x values" vector.
+      y_size: Integer >= 1 for length of "y values" vector.
+      l1_scale: Float; typical scale for kernel distance function.
+      sigma_scale: Float; typical scale for variance.
+      random_kernel_parameters: If `True`, the kernel parameters (l1 and sigma) 
+          will be sampled uniformly within [0.1, l1_scale] and [0.1, sigma_scale].
+      testing: Boolean that indicates whether we are testing. If so there are
+          more targets for visualization.
+    """
+    self._batch_size = batch_size
+    self._max_num_context = max_num_context
+    self._x_size = x_size
+    self._y_size = y_size
+    self._l1_scale = l1_scale
+    self._sigma_scale = sigma_scale
+    self._random_kernel_parameters = random_kernel_parameters
+    self._testing = testing
+    self._epsilon = epsilon
+    self._num_gammas = num_gammas
+
+  def generate_curves(self):
+    """Builds the op delivering the data.
+
+    Generated functions are `float32` with x values between -2 and 2.
+    
+    Returns:
+      A `CNPRegressionDescription` namedtuple.
+    """
+    num_context = tf.random_uniform(
+        shape=[], minval=3, maxval=self._max_num_context, dtype=tf.int32)
+
+    # If we are testing we want to have more targets and have them evenly
+    # distributed in order to plot the function.
+    if self._testing:
+      num_target = 400
+      num_total_points = num_target
+      x_values = tf.tile(
+          tf.expand_dims(tf.range(-2., 2., 1. / 100, dtype=tf.float32), axis=0),
+          [self._batch_size, 1])
+      x_values = tf.expand_dims(x_values, axis=-1)
+    # During training the number of target points and their x-positions are
+    # selected at random
+    else:
+      num_target = tf.random_uniform(shape=(), minval=0, 
+                                     maxval=self._max_num_context - num_context,
+                                     dtype=tf.int32)
+      num_total_points = num_context + num_target
+      x_values = tf.random_uniform(
+          [self._batch_size, num_total_points, self._x_size], -2, 2)
+    
+    def w(x, x_min=-2, x_max=2):
+      weight_vals = tf.stack([ [1/(i+1) if j <= i else 0 for j in range(self._num_gammas)] for i in range(self._num_gammas)])
+      
+      bucketsize = (x_max-x_min)/self._num_gammas
+      buckets = (x-x_min)/bucketsize
+      buckets = tf.reshape(buckets,[-1])
+      
+      mapped =  tf.expand_dims(tf.expand_dims(tf.map_fn(lambda x: weight_vals[tf.cast(x,tf.int32)], buckets),-2),-2)
+
+      return mapped 
+
+    # Set kernel parameters
+    # Either choose a set of random parameters for the mini-batch
+    if self._random_kernel_parameters:
+      gammas = 3.14*tf.random_uniform([self._num_gammas, self._batch_size], 0.01, 2)
+      gammas = tf.expand_dims(tf.expand_dims(gammas,-1),-1)
+      
+      weights = w(x_values)
+      
+      weights = tf.reshape(weights, [self._batch_size, num_total_points,self._x_size,self._num_gammas])
+      weights = tf.transpose(weights,[3,0,1,2])
+      
+      gammas = tf.broadcast_to(gammas,[self._num_gammas, self._batch_size, num_total_points, self._x_size])
+      x_values_bcast = tf.expand_dims(x_values, 0)
+      x_values_bcast = tf.broadcast_to(x_values_bcast,[self._num_gammas, self._batch_size, num_total_points, self._x_size])
+      
+      out = tf.math.multiply(gammas,x_values_bcast)
+      out = tf.math.multiply(weights,out)
+      out = tf.reduce_sum(out,axis=0)
+      
+      y_values = out+tf.random.normal((out.shape[0],num_total_points,out.shape[2]),stddev = self._epsilon)
+    # Or use the same fixed parameters for all mini-batches
+    else:
+      pass
+
+    if self._testing:
+      # Select the targets
+      target_x = x_values
+      target_y = y_values
+
+      # Select the observations
+      idx = tf.random_shuffle(tf.range(num_target))
+      context_x = tf.gather(x_values, idx[:num_context], axis=1)
+      context_y = tf.gather(y_values, idx[:num_context], axis=1)
+
+    else:
+      # Select the targets which will consist of the context points as well as
+      # some new target points
+      target_x = x_values[:, :num_target + num_context, :]
+      target_y = y_values[:, :num_target + num_context, :]
+
+      # Select the observations
+      context_x = x_values[:, :num_context, :]
+      context_y = y_values[:, :num_context, :]
+
+    query = ((context_x, context_y), target_x)
+
+    return NPRegressionDescription(
+        query=query,
+        target_y=target_y,
+        num_total_points=tf.shape(target_x)[1],
+        num_context_points=num_context)
+
+
+
+
+
 
 
 

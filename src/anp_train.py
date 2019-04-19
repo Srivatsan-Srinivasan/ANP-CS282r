@@ -25,6 +25,7 @@ def train_anp(args):
     KERNEL = args.kernel
     DATA_FORMAT = args.data_format
     decoder_output_size = args.decoder_output_size
+    num_gammas = args.num_gammas
     
     
     random_kernel_parameters= args.random_kernel_params 
@@ -48,7 +49,7 @@ def train_anp(args):
         
     data_train, data_test = get_data(DATA_FORMAT, kernel=KERNEL, max_context_points = MAX_CONTEXT_POINTS,
                                      random_kernel_parameters = random_kernel_parameters, 
-                                     train_batch_size = args.train_batch_size, test_batch_size = args.test_batch_size, min_context_points = MIN_CONTEXT_POINTS)
+                                     train_batch_size = args.train_batch_size, test_batch_size = args.test_batch_size, min_context_points = MIN_CONTEXT_POINTS, num_gammas = num_gammas)
 
     print('Data Generated!')
     print(data_train.query[0][0])
@@ -122,7 +123,7 @@ def train_anp(args):
                 
                 curves_filename = 'curves_'+ filename + '_' + str(it)  
                 fname = os.path.join('temp_img',curves_filename + '.png')
-                if DATA_FORMAT in ['GP','TS']:
+                if DATA_FORMAT in ['GP','TS','per_NS']:
                     plot_1D_curves(target_x, target_y, context_x, context_y, pred_y, std_y,filename = fname)
                 elif DATA_FORMAT in ['mnist']:
                     plot_imgs(target_x, target_y, context_x, context_y, pred_y, std_y,filename = fname)

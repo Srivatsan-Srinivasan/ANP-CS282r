@@ -6,7 +6,7 @@ Created on Sat Apr 13 11:17:06 2019
 """
 
 import tensorflow as tf
-from curveReader import ImageCompletionReader,GPCurvesReader, PeriodicTSCurvesReader
+from curveReader import ImageCompletionReader,GPCurvesReader, PeriodicTSCurvesReader, PeriodicNSCurvesReader
 import numpy as np
 
 # utility methods
@@ -93,7 +93,7 @@ def get_raw_img_tensor(train_test_split = 0.8, pixel_dim = 1, im_data = 'synthet
 
 # Data - expected numpy array - No.of rows by 3 Columns - id, X and Y.
 def get_data(data_format, kernel = None, max_context_points = None, 
-             random_kernel_parameters = True, test_batch_size =1, train_batch_size =16, min_context_points = None):
+             random_kernel_parameters = True, test_batch_size =1, train_batch_size =16, min_context_points = None, num_gammas = None):
     if data_format == 'GP':
         dataset_train = GPCurvesReader(
             batch_size = train_batch_size, max_num_context=max_context_points, 
@@ -130,6 +130,19 @@ def get_data(data_format, kernel = None, max_context_points = None,
                                                test_data, test_num_instances, testing = True)
         
         data_test = dataset_train.generate_curves()
+
+    elif data_format == 'per_NS':
+        dataset_train = PeriodicNSCurvesReader(
+            batch_size = train_batch_size, max_num_context=max_context_points, 
+            random_kernel_parameters=random_kernel_parameters, kernel = kernel, num_gammas = num_gammas)
+        data_train = dataset_train.generate_curves()
+        
+        # Test dataset
+        dataset_test = PeriodicNSCurvesReader(
+            batch_size = test_batch_size, max_num_context=max_context_points, testing=True,
+            random_kernel_parameters=random_kernel_parameters, kernel = kernel, num_gammas = num_gammas)
+        
+        data_test = dataset_test.generate_curves()
 
     
     return data_train, data_test
