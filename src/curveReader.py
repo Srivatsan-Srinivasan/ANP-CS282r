@@ -492,7 +492,6 @@ class ImageCompletionReader(object):
           more targets for visualization.
     """
     self._batch_size = batch_size
-    print('batchsize',batch_size)
     self._min_num_context = min_num_context
     self._max_num_context = max_num_context
     self._data = data
@@ -501,7 +500,6 @@ class ImageCompletionReader(object):
     self._y_data = self._data[:,-1:]
     self._testing = testing
     self._num_inst = num_inst
-    print(self._data.get_shape().as_list())
     self._num_pts_per_inst = tf.cast(self._data.get_shape().as_list()[0]/self._num_inst,tf.int32)
     self._x_uniq = self._x_data[:self._num_pts_per_inst]
 
@@ -529,21 +527,16 @@ class ImageCompletionReader(object):
                                      dtype=tf.int32)
       num_total_points = num_context + num_target
 
-    print('numtotalpoints',num_total_points)
-
     # idx for x vals in target
     idxs = []
     # which instance to get y data from
     insts = []
-    print('CHRIST',self._batch_size)
     for i in range(self._batch_size):
       idxs.append( tf.random_shuffle(tf.range(self._num_pts_per_inst)) )
       insts.append( tf.random_uniform(shape=[], minval=0, maxval=self._num_inst-1, dtype=tf.int32) )
       
     idxs = tf.stack(idxs)
     insts = tf.stack(insts)
-    print('idxs',idxs)
-    print('insts',insts)
       
     # batchsize x numtotalpoints x size (xsize or ysize)
     x_values = tf.stack([tf.expand_dims(tf.gather(self._x_uniq, idxs[tf.cast(i,tf.int32)][:tf.cast(num_total_points,tf.int32)]), axis=-1) for i in range(self._batch_size)])

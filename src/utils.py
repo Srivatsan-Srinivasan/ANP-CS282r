@@ -122,7 +122,6 @@ def get_data(data_format, kernel = None, max_context_points = None,
     elif data_format == 'mnist':
         train_num_instances, test_num_instances, train_data, test_data = get_raw_img_tensor(im_data=data_format)
 
-        print('num_instances',train_num_instances,test_num_instances)
         dataset_train = ImageCompletionReader(train_batch_size, min_context_points, max_context_points,
                                                train_data, train_num_instances, testing = False)
         data_train = dataset_train.generate_curves()
