@@ -52,10 +52,8 @@ def train_anp(args):
                                      train_batch_size = args.train_batch_size, test_batch_size = args.test_batch_size, min_context_points = MIN_CONTEXT_POINTS, num_gammas = num_gammas)
 
     print('Data Generated!')
-    print(data_train.query[0][0])
-    print(data_train.query[0][1])
-    print(data_train.query[1])
-    print(data_train.target_y)
+    print(data_test.query[0][0])
+    print(data_test.query[0][1])
     
     # Sizes of the layers of the MLPs for the encoders and decoder
     # The final output layer of the decoder outputs two values, one for the mean and

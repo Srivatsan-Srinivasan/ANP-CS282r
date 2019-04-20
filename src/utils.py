@@ -86,8 +86,8 @@ def get_raw_img_tensor(train_test_split = 0.8, pixel_dim = 1, im_data = 'synthet
         train_data = np.array([[i,j,k,x_train[i,j,k]] for i in range(x_train.shape[0]) for j in range(x_train.shape[1]) for k in range(x_train.shape[2])],dtype='float32')
         test_data = np.array([[i,j,k,x_test[i,j,k]] for i in range(x_test.shape[0]) for j in range(x_test.shape[1]) for k in range(x_test.shape[2])],dtype='float32')
 
-        split = train_data.shape[0]
-        inv_split = test_data.shape[0]
+        split = train_data.shape[0]//(28*28)
+        inv_split = test_data.shape[0]//(28*28)
 
     return split, inv_split, tf.convert_to_tensor(train_data), tf.convert_to_tensor(test_data) 
 
@@ -122,6 +122,7 @@ def get_data(data_format, kernel = None, max_context_points = None,
     elif data_format == 'mnist':
         train_num_instances, test_num_instances, train_data, test_data = get_raw_img_tensor(im_data=data_format)
 
+        print('num_instances',train_num_instances,test_num_instances)
         dataset_train = ImageCompletionReader(train_batch_size, min_context_points, max_context_points,
                                                train_data, train_num_instances, testing = False)
         data_train = dataset_train.generate_curves()
@@ -129,7 +130,7 @@ def get_data(data_format, kernel = None, max_context_points = None,
         dataset_test = ImageCompletionReader(test_batch_size, min_context_points, max_context_points,
                                                test_data, test_num_instances, testing = True)
         
-        data_test = dataset_train.generate_curves()
+        data_test = dataset_test.generate_curves()
 
     elif data_format == 'per_NS':
         dataset_train = PeriodicNSCurvesReader(
