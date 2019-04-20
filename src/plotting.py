@@ -49,9 +49,12 @@ def plot_1D_curves(target_x, target_y, context_x, context_y, pred_y, std, save =
       plt.savefig(filename)
 
 def plot_imgs(target_x,target_y,context_x,context_y,pred_y,std,save=True,filename = 'default',n_samp=4):
+  print('targetxshape',target_x.shape)
+  print('targetyshape',target_y.shape)
   # Hardcoded for right now
   nrows = 28 #max(target_x[:,:,0])+1
   ncols = 28 #max(target_x[:,:,1])+1
+  
 
   context_img = np.zeros((nrows,ncols))
   if len(context_x.shape) == 3:
@@ -78,7 +81,7 @@ def plot_imgs(target_x,target_y,context_x,context_y,pred_y,std,save=True,filenam
 
     for j in range(len(target_x)):
       x = target_x[j]
-      pred_imgs[i,int(x[0]),int(x[1])] = img_int[j]
+      pred_imgs[i,int(x[0]),int(x[1])] = img_int[0][j][0]
 
 
   fig=plt.figure(figsize=(16, 16))
