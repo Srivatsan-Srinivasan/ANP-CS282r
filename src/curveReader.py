@@ -84,9 +84,8 @@ class GPCurvesReader(object):
         norm = tf.reduce_sum(norm, -1)  # [B, data_size, num_total_points, num_total_points]
         # [B, y_size, num_total_points, num_total_points]
         kernel = tf.square(sigma_f)[:, :, None, None] * tf.exp(-norm)
-    elif self._kernel == 'PER_NS': # periodic, non-stationary kernel
 
-    else:
+    else: # if kernel is normal gaussian
         norm = tf.square(diff[:, None, :, :, :] / l1[:, :, None, None, :])
         norm = tf.reduce_sum(norm, -1)  # [B, data_size, num_total_points, num_total_points]
         # [B, y_size, num_total_points, num_total_points]
