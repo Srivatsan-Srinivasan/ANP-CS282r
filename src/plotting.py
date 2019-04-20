@@ -52,6 +52,7 @@ def plot_imgs(target_x,target_y,context_x,context_y,pred_y,std,save=True,filenam
   # Hardcoded for right now
   nrows = 28 #max(target_x[:,:,0])+1
   ncols = 28 #max(target_x[:,:,1])+1
+  
 
   context_img = np.zeros((nrows,ncols))
   if len(context_x.shape) == 3:
@@ -67,6 +68,9 @@ def plot_imgs(target_x,target_y,context_x,context_y,pred_y,std,save=True,filenam
     context_img[int(x[0]),int(x[1])] = context_y[i]
 
   mean = pred_y
+  print("X",context_x)
+  print("Y",context_y)
+  print(context_img,context_img.shape)
   samps = np.random.normal(pred_y,std,size=(n_samp,)+pred_y.shape)
 
   pred_imgs = np.zeros((n_samp+1,nrows,ncols))
