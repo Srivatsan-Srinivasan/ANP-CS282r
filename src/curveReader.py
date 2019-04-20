@@ -500,6 +500,7 @@ class ImageCompletionReader(object):
     self._y_data = self._data[:,-1:]
     self._testing = testing
     self._num_inst = num_inst
+    print(self._data.get_shape().as_list())
     self._num_pts_per_inst = tf.cast(self._data.get_shape().as_list()[0]/self._num_inst,tf.int32)
     self._x_uniq = self._x_data[:self._num_pts_per_inst]
 
