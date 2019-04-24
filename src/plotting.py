@@ -26,6 +26,7 @@ def plot_1D_curves(target_x, target_y, context_x, context_y, pred_y, std, save =
         predicted std dev of the y values at the target points in target_x.
   """
   # Plot everything
+  import pdb; pdb.set_trace()
   plt.plot(target_x[0], pred_y[0], 'b', linewidth=2)
   plt.plot(target_x[0], target_y[0], 'k:', linewidth=2)
   plt.plot(context_x[0], context_y[0], 'ko', markersize=10)
@@ -47,6 +48,7 @@ def plot_1D_curves(target_x, target_y, context_x, context_y, pred_y, std, save =
       plt.show()
   else:
       plt.savefig(filename)
+      plt.figure()
 
 def plot_imgs(target_x,target_y,context_x,context_y,pred_y,std,save=True,filename = 'default',n_samp=4):
   # Hardcoded for right now
@@ -96,4 +98,5 @@ def plot_imgs(target_x,target_y,context_x,context_y,pred_y,std,save=True,filenam
       plt.show()
   else:
       plt.savefig(filename)
+      plt.figure()
 
