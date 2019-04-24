@@ -43,6 +43,20 @@ def batch_mlp(input, output_sizes, variable_scope):
   return output
 
 
+def get_errors_1D(context_x, context_y, target_x, target_y, pred, std):
+    cx_flat, cy_flat, tx_flat, ty_flat, pred_flat, std_flat = context_x[0].flatten(), context_y[0].flatten(), target_x[0].flatten(), target_y[0].flatten(), pred[0].flatten(), std[0].flatten()
+
+    cy_recon = np.array([pred_flat[int(100*(round(p,2)+2))] for p in cx_flat])
+    cstd_recon = np.array([std_flat[int(100*(round(p,2)+2))] for p in cx_flat])
+
+    context_mse = np.sum(np.square(cy_recon - cy_flat)) / len(cy_flat)
+    context_nll = np.sum(np.square((cy_recon - cy_flat)/cstd_recon)) / len(cy_flat)
+    target_mse = np.sum(np.square(pred_flat - ty_flat)) / len(ty_flat)
+    target_nll = np.sum(np.square((ty_flat-pred_flat)/std_flat)) / len(ty_flat)
+
+    return context_mse, context_nll, target_mse, target_nll
+
+
 def get_raw_ts_tensor(train_test_split = 0.8):      
     data = np.random.rand(100,4)
     data = data.astype('float32')

@@ -10,7 +10,7 @@ from curveReader import GPCurvesReader
 from plotting import plot_1D_curves, plot_imgs
 from attention import Attention
 from models import LatentModel
-from utils import get_data
+from utils import get_data, get_errors_1D
 import os
 
 def train_anp(args):
@@ -39,7 +39,7 @@ def train_anp(args):
     else:
         modelname = MODEL_TYPE
 
-    filename = 'anp_loss_arr_{}_{}_{}_{}_{}_{}_{}'.format(DATA_FORMAT,modelname,ATTENTION_TYPE,
+    filename = '{}_{}_{}_{}_{}_{}_{}'.format(DATA_FORMAT, modelname, ATTENTION_TYPE,
                                                 use_decoder_self_attention,
                                                 use_encoder_determ_self_attention,
                                                 use_encoder_latent_self_attention,
@@ -94,8 +94,10 @@ def train_anp(args):
     init = tf.initialize_all_variables()
     
     # set up loss array
-    loss_arr = np.zeros(TRAINING_ITERATIONS)
-    
+    loss_arr = np.zeros(TRAINING_ITERATIONS//LOSS_AFTER)
+    context_mse_arr, context_nll_arr, target_mse_arr, target_nll_arr = np.zeros(TRAINING_ITERATIONS//LOSS_AFTER), np.zeros(TRAINING_ITERATIONS//LOSS_AFTER), np.zeros(TRAINING_ITERATIONS//LOSS_AFTER), np.zeros(TRAINING_ITERATIONS//LOSS_AFTER)
+
+
     # Train and plot
     with tf.train.MonitoredSession() as sess:
         sess.run(init)    
@@ -106,10 +108,22 @@ def train_anp(args):
                 loss_value, pred_y, std_y, target_y, whole_query = sess.run(
                   [loss, mu, sigma, data_test.target_y, 
                    data_test.query]) 
-                loss_arr[it] = loss_value   
+                loss_arr[it//LOSS_AFTER] = loss_value                
 
-                loss_filename = os.path.join('loss_collection', filename + '.npy')
+                (context_x, context_y), target_x = whole_query
+                context_mse_arr[it//LOSS_AFTER], context_nll_arr[it//LOSS_AFTER], target_mse_arr[it//LOSS_AFTER], target_nll_arr[it//LOSS_AFTER] = get_errors_1D(context_x, context_y, target_x, target_y, pred_y, std_y)
+
+                loss_filename = os.path.join('loss_collection', 'loss_'+ filename + '.npy')
+                con_nll_filename = os.path.join('loss_collection', 'context_nll_'+ filename + '.npy')
+                con_mse_filename = os.path.join('loss_collection', 'context_mse_'+ filename + '.npy')
+                tar_nll_filename = os.path.join('loss_collection', 'target_nll_' + filename + '.npy')
+                tar_mse_filename = os.path.join('loss_collection', 'tar_mse_' + filename + '.npy')
+
                 np.save(loss_filename,loss_arr)
+                np.save(con_nll_filename, context_nll_arr)
+                np.save(tar_nll_filename, target_nll_arr)
+                np.save(tar_mse_filename, target_mse_arr)
+                np.save(con_mse_filename, context_mse_arr)
                 
             # Plot the predictions in `PLOT_AFTER` intervals    
             if it % PLOT_AFTER == 0:                
