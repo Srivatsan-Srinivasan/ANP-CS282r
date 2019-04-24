@@ -81,7 +81,7 @@ def plot_imgs(target_x,target_y,context_x,context_y,pred_y,std,save=True,filenam
 
     for j in range(len(target_x)):
       x = target_x[j]
-      pred_imgs[i,int(x[0]),int(x[1])] = img_int[0][j][0]
+      pred_imgs[i,int(x[0]),int(x[1])] = img_int[j] #img_int[0][j][0]
 
 
   fig=plt.figure(figsize=(16, 16))
@@ -100,3 +100,11 @@ def plot_imgs(target_x,target_y,context_x,context_y,pred_y,std,save=True,filenam
       plt.savefig(filename)
       plt.figure()
 
+# # try out for mnist
+# context_x = np.array([[i,j] for i in range(28) for j in range(28)])
+# context_y = np.random.randn(28**2)
+# target_x = np.array([[i,j] for i in range(28) for j in range(28)])
+# target_y = np.random.randn(28**2)
+# pred_y = np.zeros(28**2)
+# std_y = 0.1*np.ones(28**2)
+# plot_imgs(target_x,target_y,context_x,context_y,pred_y,std_y,save=False)
