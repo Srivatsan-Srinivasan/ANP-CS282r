@@ -109,6 +109,7 @@ def get_raw_img_tensor(train_test_split = 0.8, pixel_dim = 1, im_data = 'synthet
 def get_data(data_format, kernel = None, max_context_points = None, 
              random_kernel_parameters = True, test_batch_size =1, train_batch_size =16, min_context_points = None, num_gammas = None):
     if data_format == 'GP':
+        print('Loading synthetic GP data with ', kernel, ' kernel')
         dataset_train = GPCurvesReader(
             batch_size = train_batch_size, max_num_context=max_context_points, 
             random_kernel_parameters=random_kernel_parameters, kernel = kernel)
@@ -122,6 +123,7 @@ def get_data(data_format, kernel = None, max_context_points = None,
         data_test = dataset_test.generate_curves()
         
     elif data_format == 'TS':
+        print('Loading TS data')
         train_num_instances, test_num_instances, train_data, test_data = get_raw_ts_tensor()
         
         dataset_train = PeriodicTSCurvesReader(train_batch_size, max_context_points,
@@ -134,6 +136,7 @@ def get_data(data_format, kernel = None, max_context_points = None,
         data_test = dataset_train.generate_curves()
 
     elif data_format == 'mnist':
+        print('Loading mnist data')
         train_num_instances, test_num_instances, train_data, test_data = get_raw_img_tensor(im_data=data_format)
 
         dataset_train = ImageCompletionReader(train_batch_size, min_context_points, max_context_points,
@@ -146,6 +149,7 @@ def get_data(data_format, kernel = None, max_context_points = None,
         data_test = dataset_test.generate_curves()
 
     elif data_format == 'per_NS':
+        print('Loading periodic sin data with num gammas = ', num_gammas)
         dataset_train = PeriodicNSCurvesReader(
             batch_size = train_batch_size, max_num_context=max_context_points, 
             random_kernel_parameters=random_kernel_parameters, num_gammas = num_gammas)
