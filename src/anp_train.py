@@ -21,7 +21,13 @@ def train_anp(args):
     LOSS_AFTER = args.loss_after
     HIDDEN_SIZE = args.h_size 
     MODEL_TYPE = args.model_type
-    ATTENTION_TYPE = args.attention #@param 
+
+    #hardcode uniform attention for simple NP - returns mean essentially.
+    if MODEL_TYPE != 'NP':
+        ATTENTION_TYPE = args.attention 
+    else:
+        ATTENTION_TYPE = 'uniform'
+
     KERNEL = args.kernel
     DATA_FORMAT = args.data_format
     decoder_output_size = args.decoder_output_size
