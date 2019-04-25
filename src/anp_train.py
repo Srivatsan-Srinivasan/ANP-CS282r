@@ -14,6 +14,23 @@ from utils import get_data, get_errors_1D
 import os
 
 def train_anp(args):
+    MODEL_SAVENAME = args.model_savename
+    # Save model
+    checkpoint_path = "training_{}/{}.ckpt".format(DATA_FORMAT,MODEL_SAVENAME)
+    checkpoint_dir = os.path.dirname(checkpoint_path)
+    # Create checkpoint callback
+    cp_callback = tf.keras.callbacks.ModelCheckpoint(checkpoint_path, 
+                                                     save_weights_only=True,
+                                                     verbose=1)
+    # code for loading model
+    # model.load_weights(checkpoint_path)
+    
+    #### Need to find out where to put callbacks into the model code (usually put it into fit, as below)!!!
+    # model.fit(train_images, train_labels,  epochs = 10, 
+    #       validation_data = (test_images,test_labels),
+    #       callbacks = [cp_callback])  # pass callback to training
+
+
     TRAINING_ITERATIONS = args.n_iter 
     MAX_CONTEXT_POINTS = args.n_context_max 
     MIN_CONTEXT_POINTS = args.n_context_min
@@ -147,6 +164,3 @@ def train_anp(args):
                 elif DATA_FORMAT in ['mnist']:
                     plot_imgs(target_x, target_y, context_x, context_y, pred_y, std_y,filename = fname)
 
-          
-        
-          
