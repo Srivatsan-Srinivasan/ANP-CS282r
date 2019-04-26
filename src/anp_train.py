@@ -14,7 +14,6 @@ from utils import get_data, get_errors_1D
 import os
 
 def train_anp(args):
-    MODEL_SAVENAME = args.model_savename
     TRAINING_ITERATIONS = args.n_iter 
     MAX_CONTEXT_POINTS = args.n_context_max 
     MIN_CONTEXT_POINTS = args.n_context_min
@@ -159,16 +158,6 @@ def train_anp(args):
                     plot_1D_curves(target_x, target_y, context_x, context_y, pred_y, std_y,filename = fname)
                 elif DATA_FORMAT in ['mnist']:
                     plot_imgs(target_x, target_y, context_x, context_y, pred_y, std_y,filename = fname)
-    
-        saver = tf.train.Saver()
-        save_path = "training_{}/{}.ckpt".format(DATA_FORMAT,MODEL_SAVENAME)
-        saving_to_path = saver.save(sess, save_path)
-        print("Model saved in path: %s" % saving_to_path)
-
-        # saver = tf.train.Saver()
-        # # Restore variables from disk.
-        # saver.restore(sess, "/tmp/model.ckpt")
-        # print("Model restored.")
 
 
 

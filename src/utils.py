@@ -115,7 +115,7 @@ def get_raw_img_tensor(train_test_split = 0.8, pixel_dim = 1, im_data = 'synthet
 
 # Data - expected numpy array - No.of rows by 3 Columns - id, X and Y.
 def get_data(data_format, kernel = None, max_context_points = None, 
-             random_kernel_parameters = True, test_batch_size =1, train_batch_size =16, min_context_points = None, num_gammas = None):
+             random_kernel_parameters = True, test_batch_size =1, train_batch_size =16, min_context_points = None, num_gammas = None, seed=None):
     if data_format == 'GP':
         print('Loading synthetic GP data with ', kernel, ' kernel')
         dataset_train = GPCurvesReader(
@@ -128,7 +128,7 @@ def get_data(data_format, kernel = None, max_context_points = None,
             batch_size = test_batch_size, max_num_context=max_context_points, testing=True,
             random_kernel_parameters=random_kernel_parameters, kernel = kernel)
         
-        data_test = dataset_test.generate_curves()
+        data_test = dataset_test.generate_curves(seed=seed)
         
     elif data_format == 'TS':
         print('Loading TS data')
@@ -141,7 +141,7 @@ def get_data(data_format, kernel = None, max_context_points = None,
         dataset_test = PeriodicTSCurvesReader(test_batch_size, max_context_points,
                                                test_data, test_num_instances, testing = True)
         
-        data_test = dataset_train.generate_curves()
+        data_test = dataset_train.generate_curves(seed=seed)
 
     elif data_format == 'mnist':
         print('Loading mnist data')
@@ -154,7 +154,7 @@ def get_data(data_format, kernel = None, max_context_points = None,
         dataset_test = ImageCompletionReader(test_batch_size, min_context_points, max_context_points,
                                                test_data, test_num_instances, testing = True)
         
-        data_test = dataset_test.generate_curves()
+        data_test = dataset_test.generate_curves(seed=seed)
 
     elif data_format == 'per_NS':
         print('Loading periodic sin data with num gammas = ', num_gammas)
@@ -168,7 +168,7 @@ def get_data(data_format, kernel = None, max_context_points = None,
             batch_size = test_batch_size, max_num_context=max_context_points, testing=True,
             random_kernel_parameters=random_kernel_parameters, num_gammas = num_gammas)
         
-        data_test = dataset_test.generate_curves()
+        data_test = dataset_test.generate_curves(seed=seed)
 
     
     return data_train, data_test
