@@ -120,7 +120,7 @@ def train_anp(args):
             sess.run([train_step])    
             
             if it % LOSS_AFTER == 0:
-                if it > N_EPOCHS_FIXED:
+                if it <= N_EPOCHS_FIXED:
                     loss_value, pred_y, std_y, target_y, whole_query = sess.run(
                       [loss, mu, sigma, data_test.target_y, 
                        data_test.query])
@@ -128,10 +128,12 @@ def train_anp(args):
                     loss_value, pred_y, std_y, target_y, whole_query = sess.run(
                       [loss, mu, sigma, data_test_fixed.target_y, 
                        data_test_fixed.query])
+                    print(it)
 
                 loss_arr[it//LOSS_AFTER] = loss_value                
 
                 (context_x, context_y), target_x = whole_query
+                import pdb; pdb.set_trace()
                 context_mse_arr[it//LOSS_AFTER], context_nll_arr[it//LOSS_AFTER], target_mse_arr[it//LOSS_AFTER], target_nll_arr[it//LOSS_AFTER] = get_errors_1D(context_x, context_y, target_x, target_y, pred_y, std_y)
 
                 loss_filename = os.path.join('loss_collection', 'loss_'+ filename + '.npy')
