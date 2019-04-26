@@ -132,7 +132,8 @@ def train_anp(args):
                 loss_arr[it//LOSS_AFTER] = loss_value                
 
                 (context_x, context_y), target_x = whole_query
-                context_mse_arr[it//LOSS_AFTER], context_nll_arr[it//LOSS_AFTER], target_mse_arr[it//LOSS_AFTER], target_nll_arr[it//LOSS_AFTER] = get_errors_1D(context_x, context_y, target_x, target_y, pred_y, std_y)
+                if DATA_FORMAT != 'mnist':
+                    context_mse_arr[it//LOSS_AFTER], context_nll_arr[it//LOSS_AFTER], target_mse_arr[it//LOSS_AFTER], target_nll_arr[it//LOSS_AFTER] = get_errors_1D(context_x, context_y, target_x, target_y, pred_y, std_y)
 
                 loss_filename = os.path.join('loss_collection', 'loss_'+ filename + '.npy')
                 con_nll_filename = os.path.join('loss_collection', 'context_nll_'+ filename + '.npy')

@@ -10,7 +10,7 @@ import numpy as np
 #@title
 def plot_1D_curves(target_x, target_y, context_x, context_y, pred_y, std, save = True, filename = 'default'):
   """Plots the predicted mean and variance and the context points.
-  
+    
   Args: 
     target_x: An array of shape [B,num_targets,1] that contains the
         x values of the target points.
@@ -81,7 +81,7 @@ def plot_imgs(target_x,target_y,context_x,context_y,pred_y,std,save=True,filenam
 
     for j in range(len(target_x)):
       x = target_x[j]
-      pred_imgs[i,int(x[0]),int(x[1])] = img_int[j] #img_int[0][j][0]
+      pred_imgs[i,int(x[0]),int(x[1])] = img_int[0][j] #img_int[0][j][0]
 
 
   fig=plt.figure(figsize=(16, 16))
