@@ -22,6 +22,8 @@ def train_anp(args):
     LOSS_AFTER = args.loss_after
     HIDDEN_SIZE = args.h_size 
     MODEL_TYPE = args.model_type
+    SEED_VALUE = args.seed_value
+    N_EPOCHS_FIXED = 0.8*TRAINING_ITERATIONS
 
     #hardcode uniform attention for simple NP - returns mean essentially.
     if MODEL_TYPE != 'NP':
@@ -60,6 +62,10 @@ def train_anp(args):
     data_train, data_test = get_data(DATA_FORMAT, kernel=KERNEL, max_context_points = MAX_CONTEXT_POINTS,
                                      random_kernel_parameters = random_kernel_parameters, 
                                      train_batch_size = args.train_batch_size, test_batch_size = args.test_batch_size, min_context_points = MIN_CONTEXT_POINTS, num_gammas = num_gammas)
+
+    _, data_test_fixed = get_data(DATA_FORMAT, kernel=KERNEL, max_context_points = MAX_CONTEXT_POINTS,
+                                     random_kernel_parameters = random_kernel_parameters, 
+                                     train_batch_size = args.train_batch_size, test_batch_size = args.test_batch_size, min_context_points = MIN_CONTEXT_POINTS, num_gammas = num_gammas, seed=SEED_VALUE)
 
     print('Data Generated!')
     
@@ -115,9 +121,17 @@ def train_anp(args):
             sess.run([train_step])    
             
             if it % LOSS_AFTER == 0:
-                loss_value, pred_y, std_y, target_y, whole_query = sess.run(
-                  [loss, mu, sigma, data_test.target_y, 
-                   data_test.query]) 
+                if it > N_EPOCHS_FIXED:
+                    loss_value, pred_y, std_y, target_y, whole_query = sess.run(
+                      [loss, mu, sigma, data_test.target_y, 
+                       data_test.query])
+                else:
+                    loss_value, pred_y, std_y, target_y, whole_query = sess.run(
+                      [loss, mu, sigma, data_test_fixed.target_y, 
+                       data_test_fixed.query])
+                    print(data_test_fixed.query[0][0],data_test_fixed.query[0][1])
+                    print(data_test_fixed.query[1],data_test_fixed.target_y)
+
                 loss_arr[it//LOSS_AFTER] = loss_value                
 
                 (context_x, context_y), target_x = whole_query

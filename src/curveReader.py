@@ -96,7 +96,7 @@ class GPCurvesReader(object):
 
     return kernel
 
-  def generate_curves(self):
+  def generate_curves(self, seed = None):
     """Builds the op delivering the data.
 
     Generated functions are `float32` with x values between -2 and 2.
@@ -105,7 +105,7 @@ class GPCurvesReader(object):
       A `CNPRegressionDescription` namedtuple.
     """
     num_context = tf.random_uniform(
-        shape=[], minval=3, maxval=self._max_num_context, dtype=tf.int32)
+        shape=[], minval=3, maxval=self._max_num_context, dtype=tf.int32, seed=seed)
 
     # If we are testing we want to have more targets and have them evenly
     # distributed in order to plot the function.
@@ -121,10 +121,10 @@ class GPCurvesReader(object):
     else:
       num_target = tf.random_uniform(shape=(), minval=0, 
                                      maxval=self._max_num_context - num_context,
-                                     dtype=tf.int32)
+                                     dtype=tf.int32, seed=seed)
       num_total_points = num_context + num_target
       x_values = tf.random_uniform(
-          [self._batch_size, num_total_points, self._x_size], -2, 2)
+          [self._batch_size, num_total_points, self._x_size], -2, 2, seed=seed)
 
     # Set kernel parameters
     # Either choose a set of random parameters for the mini-batch
@@ -151,7 +151,7 @@ class GPCurvesReader(object):
     # [batch_size, y_size, num_total_points, 1]
     y_values = tf.matmul(
         cholesky,
-        tf.random_normal([self._batch_size, self._y_size, num_total_points, 1]))
+        tf.random_normal([self._batch_size, self._y_size, num_total_points, 1], seed=seed))
 
     # [batch_size, num_total_points, y_size]
     y_values = tf.transpose(tf.squeeze(y_values, 3), [0, 2, 1])
@@ -162,7 +162,7 @@ class GPCurvesReader(object):
       target_y = y_values
 
       # Select the observations
-      idx = tf.random_shuffle(tf.range(num_target))
+      idx = tf.random_shuffle(tf.range(num_target), seed=seed)
       context_x = tf.gather(x_values, idx[:num_context], axis=1)
       context_y = tf.gather(y_values, idx[:num_context], axis=1)
 
@@ -228,7 +228,7 @@ class PeriodicTSCurvesReader(object):
     self._num_pts_per_inst = tf.cast(self._data.get_shape().as_list()[0]/self._num_inst,tf.int32)
     self._x_uniq = self._x_data[:self._num_pts_per_inst] #tf.unique(self._x_data)
 
-  def generate_curves(self):
+  def generate_curves(self, seed=None):
     """Builds the op delivering the data.
 
     Generated functions are `float32` with x values between -2 and 2.
@@ -237,7 +237,7 @@ class PeriodicTSCurvesReader(object):
       A `CNPRegressionDescription` namedtuple.
     """
     num_context = tf.random_uniform(
-        shape=[], minval=3, maxval=self._max_num_context, dtype=tf.int32)
+        shape=[], minval=3, maxval=self._max_num_context, dtype=tf.int32, seed=seed)
 
     # If we are testing we want to have more targets and have them evenly
     # distributed in order to plot the function.
@@ -249,7 +249,7 @@ class PeriodicTSCurvesReader(object):
     else:
       num_target = tf.random_uniform(shape=(), minval=0, 
                                      maxval=self._max_num_context - num_context,
-                                     dtype=tf.int32)
+                                     dtype=tf.int32, seed=seed)
       num_total_points = num_context + num_target
 
     # idx for x vals in target
@@ -257,8 +257,8 @@ class PeriodicTSCurvesReader(object):
     # which instance to get y data from
     insts = []
     for i in range(self._batch_size):
-      idxs.append( tf.random_shuffle(tf.range(self._num_pts_per_inst)) )
-      insts.append( tf.random_uniform(shape=[], minval=0, maxval=self._num_inst-1, dtype=tf.int32) )
+      idxs.append( tf.random_shuffle(tf.range(self._num_pts_per_inst), seed=seed) )
+      insts.append( tf.random_uniform(shape=[], minval=0, maxval=self._num_inst-1, dtype=tf.int32, seed=seed) )
       
     idxs = tf.stack(idxs)
     insts = tf.stack(insts)
@@ -275,7 +275,7 @@ class PeriodicTSCurvesReader(object):
       target_y = y_values
 
       # Select the observations
-      idx_ctxt = tf.random_shuffle(tf.range(num_target))
+      idx_ctxt = tf.random_shuffle(tf.range(num_target), seed=seed)
       context_x = tf.gather(x_values, idx_ctxt[:num_context], axis=1)
       context_y = tf.gather(y_values, idx_ctxt[:num_context], axis=1)
 
@@ -356,7 +356,7 @@ class PeriodicNSCurvesReader(object):
     self._epsilon = epsilon
     self._num_gammas = num_gammas
 
-  def generate_curves(self):
+  def generate_curves(self, seed=None):
     """Builds the op delivering the data.
 
     Generated functions are `float32` with x values between -2 and 2.
@@ -365,7 +365,7 @@ class PeriodicNSCurvesReader(object):
       A `CNPRegressionDescription` namedtuple.
     """
     num_context = tf.random_uniform(
-        shape=[], minval=3, maxval=self._max_num_context, dtype=tf.int32)
+        shape=[], minval=3, maxval=self._max_num_context, dtype=tf.int32, seed=seed)
 
     # If we are testing we want to have more targets and have them evenly
     # distributed in order to plot the function.
@@ -381,10 +381,10 @@ class PeriodicNSCurvesReader(object):
     else:
       num_target = tf.random_uniform(shape=(), minval=0, 
                                      maxval=self._max_num_context - num_context,
-                                     dtype=tf.int32)
+                                     dtype=tf.int32, seed=seed)
       num_total_points = num_context + num_target
       x_values = tf.random_uniform(
-          [self._batch_size, num_total_points, self._x_size], -2, 2)
+          [self._batch_size, num_total_points, self._x_size], -2, 2, seed=seed)
     
     def w(x, x_min=-2, x_max=2):
       weight_vals = tf.stack([ [1/(i+1) if j <= i else 0 for j in range(self._num_gammas)] for i in range(self._num_gammas)])
@@ -417,7 +417,7 @@ class PeriodicNSCurvesReader(object):
       out = tf.reduce_sum(out,axis=0)
       
       y_values = out
-      y_values += tf.random.normal((self._batch_size,num_total_points,self._y_size),stddev = self._epsilon)
+      y_values += tf.random.normal((self._batch_size,num_total_points,self._y_size),stddev = self._epsilon, seed=seed)
     # Or use the same fixed parameters for all mini-batches
     else:
       pass
@@ -428,7 +428,7 @@ class PeriodicNSCurvesReader(object):
       target_y = y_values
 
       # Select the observations
-      idx = tf.random_shuffle(tf.range(num_target))
+      idx = tf.random_shuffle(tf.range(num_target), seed=seed)
       context_x = tf.gather(x_values, idx[:num_context], axis=1)
       context_y = tf.gather(y_values, idx[:num_context], axis=1)
 
@@ -503,7 +503,7 @@ class ImageCompletionReader(object):
     self._num_pts_per_inst = tf.cast(self._data.get_shape().as_list()[0]/self._num_inst,tf.int32)
     self._x_uniq = self._x_data[:self._num_pts_per_inst]
 
-  def generate_curves(self):
+  def generate_curves(self, seed=None):
     """Builds the op delivering the data.
 
     Generated functions are `float32` with x values between -2 and 2.
@@ -512,7 +512,7 @@ class ImageCompletionReader(object):
       A `CNPRegressionDescription` namedtuple.
     """
     num_context = tf.random_uniform(
-        shape=[], minval=self._min_num_context, maxval=self._max_num_context, dtype=tf.int32)
+        shape=[], minval=self._min_num_context, maxval=self._max_num_context, dtype=tf.int32, seed=seed)
 
     # If we are testing we want to have more targets and have them evenly
     # distributed in order to plot the function.
@@ -524,7 +524,7 @@ class ImageCompletionReader(object):
     else:
       num_target = tf.random_uniform(shape=(), minval=0, 
                                      maxval=self._max_num_context - num_context,
-                                     dtype=tf.int32)
+                                     dtype=tf.int32, seed=seed)
       num_total_points = num_context + num_target
 
     # idx for x vals in target
@@ -532,8 +532,8 @@ class ImageCompletionReader(object):
     # which instance to get y data from
     insts = []
     for i in range(self._batch_size):
-      idxs.append( tf.random_shuffle(tf.range(self._num_pts_per_inst)) )
-      insts.append( tf.random_uniform(shape=[], minval=0, maxval=self._num_inst-1, dtype=tf.int32) )
+      idxs.append( tf.random_shuffle(tf.range(self._num_pts_per_inst), seed=seed) )
+      insts.append( tf.random_uniform(shape=[], minval=0, maxval=self._num_inst-1, dtype=tf.int32, seed=seed) )
       
     idxs = tf.stack(idxs)
     insts = tf.stack(insts)
@@ -550,7 +550,7 @@ class ImageCompletionReader(object):
       target_y = y_values
 
       # Select the observations
-      idx_ctxt = tf.random_shuffle(tf.range(num_target))
+      idx_ctxt = tf.random_shuffle(tf.range(num_target), seed=seed)
       context_x = tf.gather(x_values, idx_ctxt[:num_context], axis=1)
       context_y = tf.gather(y_values, idx_ctxt[:num_context], axis=1)
 
