@@ -129,8 +129,6 @@ def train_anp(args):
                     loss_value, pred_y, std_y, target_y, whole_query = sess.run(
                       [loss, mu, sigma, data_test_fixed.target_y, 
                        data_test_fixed.query])
-                    print(data_test_fixed.query[0][0],data_test_fixed.query[0][1])
-                    print(data_test_fixed.query[1],data_test_fixed.target_y)
 
                 loss_arr[it//LOSS_AFTER] = loss_value                
 
