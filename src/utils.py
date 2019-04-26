@@ -8,6 +8,8 @@ Created on Sat Apr 13 11:17:06 2019
 import tensorflow as tf
 from curveReader import ImageCompletionReader,GPCurvesReader, PeriodicTSCurvesReader, PeriodicNSCurvesReader
 import numpy as np
+from sklearn.gaussian_process import GaussianProcessRegressor
+from sklearn.gaussian_process.kernels import RBF
 
 # utility methods
 def batch_mlp(input, output_sizes, variable_scope):
@@ -55,6 +57,12 @@ def get_errors_1D(context_x, context_y, target_x, target_y, pred, std):
     target_nll = np.sum(np.square((ty_flat-pred_flat)/std_flat)) / len(ty_flat)
 
     return context_mse, context_nll, target_mse, target_nll
+
+def get_GP_mean_std(x_context, y_context, x_target,length_scale=1):
+    kernel = 1.0 * RBF(length_scale=length_scale, length_scale_bounds=(1e-2, 1e3)) 
+    gp = GaussianProcessRegressor(kernel=kernel, alpha=0.5).fit(x_context, y_context)
+    y_mean, y_cov = gp.predict(x_target, return_cov=True)
+    return y_mean, np.sqrt(np.diag(y_cov))   
 
 
 def get_raw_ts_tensor(train_test_split = 0.8):      
