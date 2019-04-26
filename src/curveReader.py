@@ -402,25 +402,27 @@ class PeriodicNSCurvesReader(object):
     if self._random_kernel_parameters:
       gammas = 3.14*tf.random_uniform([self._num_gammas, self._batch_size], 0.1, 2)
       gammas = tf.expand_dims(tf.expand_dims(gammas,-1),-1)
-      
-      weights = w(x_values)
-      
-      weights = tf.reshape(weights, [self._batch_size, num_total_points,self._x_size,self._num_gammas])
-      weights = tf.transpose(weights,[3,0,1,2])
-      
-      gammas = tf.broadcast_to(gammas,[self._num_gammas, self._batch_size, num_total_points, self._x_size])
-      x_values_bcast = tf.expand_dims(x_values, 0)
-      x_values_bcast = tf.broadcast_to(x_values_bcast,[self._num_gammas, self._batch_size, num_total_points, self._x_size])
-      
-      out = tf.math.multiply(gammas,x_values_bcast)
-      out = tf.math.multiply(weights,tf.sin(out))
-      out = tf.reduce_sum(out,axis=0)
-      
-      y_values = out
-      y_values += tf.random.normal((self._batch_size,num_total_points,self._y_size),stddev = self._epsilon, seed=seed)
     # Or use the same fixed parameters for all mini-batches
     else:
-      pass
+      gammas = 3.14*tf.linspace(0.1,2,self._num_gammas)
+      gammas = tf.broadcast_to(gammas,[self._num_gammas, self._batch_size])
+      gammas = tf.expand_dims(tf.expand_dims(gammas,-1),-1)
+
+    weights = w(x_values)
+      
+    weights = tf.reshape(weights, [self._batch_size, num_total_points,self._x_size,self._num_gammas])
+    weights = tf.transpose(weights,[3,0,1,2])
+    
+    gammas = tf.broadcast_to(gammas,[self._num_gammas, self._batch_size, num_total_points, self._x_size])
+    x_values_bcast = tf.expand_dims(x_values, 0)
+    x_values_bcast = tf.broadcast_to(x_values_bcast,[self._num_gammas, self._batch_size, num_total_points, self._x_size])
+    
+    out = tf.math.multiply(gammas,x_values_bcast)
+    out = tf.math.multiply(weights,tf.sin(out))
+    out = tf.reduce_sum(out,axis=0)
+    
+    y_values = out
+    y_values += tf.random.normal((self._batch_size,num_total_points,self._y_size),stddev = self._epsilon, seed=seed)
 
     if self._testing:
       # Select the targets
