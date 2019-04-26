@@ -62,9 +62,9 @@ def train_anp(args):
                                      random_kernel_parameters = random_kernel_parameters, 
                                      train_batch_size = args.train_batch_size, test_batch_size = args.test_batch_size, min_context_points = MIN_CONTEXT_POINTS, num_gammas = num_gammas)
 
-    # _, data_test_fixed = get_data(DATA_FORMAT, kernel=KERNEL, max_context_points = MAX_CONTEXT_POINTS,
-    #                                  random_kernel_parameters = random_kernel_parameters, 
-    #                                  train_batch_size = args.train_batch_size, test_batch_size = args.test_batch_size, min_context_points = MIN_CONTEXT_POINTS, num_gammas = num_gammas, seed=SEED_VALUE)
+    _, data_test_fixed = get_data(DATA_FORMAT, kernel=KERNEL, max_context_points = MAX_CONTEXT_POINTS,
+                                     random_kernel_parameters = random_kernel_parameters, 
+                                     train_batch_size = args.train_batch_size, test_batch_size = args.test_batch_size, min_context_points = MIN_CONTEXT_POINTS, num_gammas = num_gammas, seed=SEED_VALUE)
 
     print('Data Generated!')
     
@@ -125,10 +125,6 @@ def train_anp(args):
                       [loss, mu, sigma, data_test.target_y, 
                        data_test.query])
                 else:
-                    _, data_test_fixed = get_data(DATA_FORMAT, kernel=KERNEL, max_context_points = MAX_CONTEXT_POINTS,
-                                     random_kernel_parameters = random_kernel_parameters, 
-                                     train_batch_size = args.train_batch_size, test_batch_size = args.test_batch_size, min_context_points = MIN_CONTEXT_POINTS, num_gammas = num_gammas, seed=SEED_VALUE)
-                    
                     loss_value, pred_y, std_y, target_y, whole_query = sess.run(
                       [loss, mu, sigma, data_test_fixed.target_y, 
                        data_test_fixed.query])
