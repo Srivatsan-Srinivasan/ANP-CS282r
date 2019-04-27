@@ -25,7 +25,7 @@ parser.add_argument('--train_batch_size', action = 'store', default = 16, type=i
 parser.add_argument('--test_batch_size', action = 'store', default = 1, type=int)
 parser.add_argument('--decoder_output_size', action = 'store', default = 1, type = int)
 parser.add_argument('--num_gammas', action='store',default = 2,type=int)
-parser.add_argument('--seed_value', action='store', default=1, type=int)
+parser.add_argument('--seed_value', action='store', default= -68, type=int)
 
 #####BOOLEAN##########
 parser.add_argument('--random_kernel_params', action='store_true', default = True)
