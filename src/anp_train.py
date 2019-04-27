@@ -120,7 +120,7 @@ def train_anp(args):
             sess.run([train_step])    
             
             if it % LOSS_AFTER == 0:
-                if it <= N_EPOCHS_FIXED:
+                if it < N_EPOCHS_FIXED:
                     loss_value, pred_y, std_y, target_y, whole_query = sess.run(
                       [loss, mu, sigma, data_test.target_y, 
                        data_test.query])
