@@ -28,7 +28,7 @@ parser.add_argument('--num_gammas', action='store',default = 2,type=int)
 parser.add_argument('--seed_value', action='store', default= -68, type=int)
 
 #####BOOLEAN##########
-parser.add_argument('--random_kernel_params', action='store_true', default = True)
+parser.add_argument('--random_kernel_params', action='store_true', default = False)
 parser.add_argument('--SA_decoder', action='store_true', default = False)
 parser.add_argument('--SA_det_encoder', action='store_true', default = False)
 parser.add_argument('--SA_lat_encoder', action='store_true', default = False)
