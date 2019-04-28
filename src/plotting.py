@@ -54,9 +54,11 @@ def plot_imgs(target_x,target_y,context_x,context_y,pred_y,std,save=True,filenam
   # Hardcoded for right now
   nrows = 28 #max(target_x[:,:,0])+1
   ncols = 28 #max(target_x[:,:,1])+1
+  nchannels = 3 #RGB
   
+  context_img = np.zeros((nrows,ncols,nchannels))
+  context_img[:,:,2] = 1
 
-  context_img = np.zeros((nrows,ncols))
   if len(context_x.shape) == 3:
     context_x = context_x[0]
     context_y = context_y[0]
@@ -64,27 +66,28 @@ def plot_imgs(target_x,target_y,context_x,context_y,pred_y,std,save=True,filenam
     target_x = target_x[0]
     target_y = target_y[0]
 
-
   for i in range(len(context_x)):
     x = context_x[i]
-    context_img[int(x[0]),int(x[1])] = context_y[i]
+    context_img[int(x[0]),int(x[1])] = np.array(list(context_y[i])*nchannels)
 
   mean = pred_y
   samps = np.random.normal(pred_y,std,size=(n_samp,)+pred_y.shape)
-
-  pred_imgs = np.zeros((n_samp+1,nrows,ncols))
+  
+  
+  pred_imgs = np.zeros((n_samp+1,nrows,ncols,nchannels))
   for i in range(n_samp+1):
     if i == 0:
-      img_int = pred_y
+      img_int = np.clip(pred_y,0,1)
     else:
-      img_int = samps[i-1]
+      img_int = np.clip(samps[i-1],0,1)
 
     for j in range(len(target_x)):
-      x = target_x[j]
-      pred_imgs[i,int(x[0]),int(x[1])] = img_int[0][j] #img_int[0][j][0]
+      x = target_x[j]      
+      pred_imgs[i,int(x[0]),int(x[1])] = np.array(list(img_int[0][j])*nchannels) #img_int[0][j][0]
 
 
   fig=plt.figure(figsize=(16, 16))
+  
   columns = 1
   rows = n_samp+2
   for i in range(1, columns*rows +1):
