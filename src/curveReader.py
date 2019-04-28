@@ -405,7 +405,9 @@ class PeriodicNSCurvesReader(object):
     # Or use the same fixed parameters for all mini-batches
     else:
       gammas = 3.14*tf.linspace(0.1,2,self._num_gammas)
-      gammas = tf.broadcast_to(gammas,[self._num_gammas, self._batch_size])
+      print(gammas)
+      #gammas = tf.broadcast_to(gammas,[self._num_gammas, self._batch_size])
+      gammas = tf.reshape(tf.tile(gammas,tf.constant([self._batch_size])),[self._num_gammas, self._batch_size])
       gammas = tf.expand_dims(tf.expand_dims(gammas,-1),-1)
 
     weights = w(x_values)
